@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI-powered demand forecasting dashboard for inventory cost reduction using Bidirectional LSTM deep learning" />
+  <title>DemandAI — Forecasting Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Animated background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ── NAVBAR ──────────────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" stroke="url(#logoGrad)" stroke-width="2"/>
+          <path d="M10 22 L14 14 L18 18 L22 10" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="nav-title">DemandAI</span>
+    </div>
+    <div class="nav-center">
+      <span class="nav-subtitle">Demand Forecasting &amp; Inventory Optimization</span>
+    </div>
+    <div class="nav-right">
+      <span class="status-chip" id="statusChip">
+        <span class="status-dot"></span>
+        <span id="statusText">Loading…</span>
+      </span>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTAINER ─────────────────────────────────────── -->
+  <main class="main-container">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-label">Bidirectional LSTM · Production Ready · Sem 4 ML Project</div>
+      <h1 class="hero-title">
+        Intelligent <span class="gradient-text">Demand Forecasting</span><br/>
+        for Inventory Cost Reduction
+      </h1>
+      <p class="hero-desc">
+        Deep learning model trained on multi-store, multi-product time-series data.
+        Predicts next-day demand with high accuracy to minimise holding &amp; stockout costs.
+      </p>
+    </section>
+
+    <!-- KPI CARDS -->
+    <section class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card fade-in" style="--delay:.05s" id="kpiMAE">
+        <div class="kpi-icon kpi-icon--violet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        </div>
+        <div class="kpi-label">Test MAE</div>
+        <div class="kpi-value" id="valMAE">—</div>
+        <div class="kpi-sub">units mean absolute error</div>
+      </div>
+      <div class="kpi-card fade-in" style="--delay:.12s" id="kpiRMSE">
+        <div class="kpi-icon kpi-icon--cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="kpi-label">Test RMSE</div>
+        <div class="kpi-value" id="valRMSE">—</div>
+        <div class="kpi-sub">root mean square error</div>
+      </div>
+      <div class="kpi-card fade-in" style="--delay:.19s" id="kpiR2">
+        <div class="kpi-icon kpi-icon--emerald">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="kpi-label">R² Score</div>
+        <div class="kpi-value" id="valR2">—</div>
+        <div class="kpi-sub">coefficient of determination</div>
+      </div>
+      <div class="kpi-card fade-in" style="--delay:.26s" id="kpiSamples">
+        <div class="kpi-icon kpi-icon--amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="kpi-label">Test Predictions</div>
+        <div class="kpi-value" id="valSamples">—</div>
+        <div class="kpi-sub">across all entities</div>
+      </div>
+    </section>
+
+    <!-- FORECAST + CONTROLS -->
+    <section class="card main-chart-card fade-in" style="--delay:.33s">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">Forecast Explorer</h2>
+          <p class="card-desc">Actual vs Predicted demand — 30-day lookback Bi-LSTM</p>
+        </div>
+        <div class="controls-row">
+          <div class="select-wrap">
+            <label class="select-label">Store</label>
+            <select id="storeSelect" class="fancy-select"></select>
+          </div>
+          <div class="select-wrap">
+            <label class="select-label">Product</label>
+            <select id="productSelect" class="fancy-select"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab strip -->
+      <div class="tab-strip" role="tablist">
+        <button class="tab-btn active" data-tab="forecast" role="tab" aria-selected="true" id="tabForecast">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 8 L8 10 L11 5 L14 7"/></svg>
+          Forecast
+        </button>
+        <button class="tab-btn" data-tab="history" role="tab" aria-selected="false" id="tabHistory">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v5l3 3"/><circle cx="8" cy="8" r="6"/></svg>
+          Training History
+        </button>
+      </div>
+
+      <!-- Chart panes -->
+      <div class="chart-pane" id="paneForecast">
+        <canvas id="forecastChart"></canvas>
+        <div class="chart-legend-custom" id="forecastLegend">
+          <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span>Actual</span>
+          <span class="legend-item"><span class="legend-dot legend-dash" style="background:#06b6d4"></span>Predicted</span>
+        </div>
+      </div>
+      <div class="chart-pane hidden" id="paneHistory">
+        <canvas id="historyChart"></canvas>
+        <div class="chart-legend-custom">
+          <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span>Train Loss</span>
+          <span class="legend-item"><span class="legend-dot legend-dash" style="background:#06b6d4"></span>Val Loss</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM ROW -->
+    <div class="bottom-grid">
+
+      <!-- Per-entity performance -->
+      <section class="card perf-card fade-in" style="--delay:.4s">
+        <div class="card-header">
+          <h2 class="card-title">Per-Entity MAE</h2>
+          <p class="card-desc">Lower is better · units</p>
+        </div>
+        <div class="perf-list" id="perfList"></div>
+      </section>
+
+      <!-- Cost savings panel -->
+      <section class="card cost-card fade-in" style="--delay:.47s">
+        <div class="card-header">
+          <h2 class="card-title">Inventory Cost Impact</h2>
+          <p class="card-desc">Estimated savings from accurate forecasting</p>
+        </div>
+        <div class="cost-grid">
+          <div class="cost-item cost-item--green">
+            <div class="cost-item-label">Holding Cost Reduction</div>
+            <div class="cost-item-value" id="costHolding">—</div>
+            <div class="cost-item-sub">₹ per unit/day saved on avg overstock</div>
+          </div>
+          <div class="cost-item cost-item--red">
+            <div class="cost-item-label">Stockout Cost Avoidance</div>
+            <div class="cost-item-value" id="costStockout">—</div>
+            <div class="cost-item-sub">₹ per unit saved on missed sales</div>
+          </div>
+          <div class="cost-item cost-item--violet full-span">
+            <div class="cost-item-label">Forecast Accuracy Band</div>
+            <div class="cost-item-value" id="costBand">—</div>
+            <div class="cost-item-sub">avg demand ± MAE (safety stock window)</div>
+          </div>
+        </div>
+        <div class="cost-note">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5"/></svg>
+          Cost constants derived from dataset: ₹<span id="holdConst">3.0</span>/unit holding · ₹<span id="stockConst">22.5</span>/unit stockout  
+        </div>
+      </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>DemandAI · Bi-directional LSTM · Demand Forecasting for Inventory Cost Reduction · Sem 4 ML Project</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
