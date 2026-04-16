@@ -1,0 +1,61 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+.eggs/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── Jupyter Notebook ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ─── Machine Learning / Data ──────────────────────────────────────────────────
+# Uncomment if you want to exclude large model weights:
+# *.keras
+# *.h5
+# *.pt
+# *.pth
+# *.ckpt
+# *.pkl
+
+# Large datasets (keep CSV in repo if small; exclude if large)
+# *.csv
+
+# ─── OS & Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ─── Logs & Temp ──────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.swp
+~$*
+
+# ─── Node (if any frontend tooling is added later) ────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ─── Environment / Secrets ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*
+secrets.json
