@@ -1,5 +1,5 @@
 # Demand Forecasting for Inventory Cost Reduction
-## Comprehensive Project Report — Sem 4 Machine Learning
+## Comprehensive Project Report — Machine Learning
 
 ---
 
@@ -321,7 +321,25 @@ Saves the model state whenever validation loss hits a new minimum. Even if train
 
 ---
 
-## 6. Inverse Scaling — How Predictions Are Denormalized
+## 6. How to Run Our Code
+
+1. **Train the Model & Generate Predictions:**
+   - Open and run all cells in `project/production_ready_dl_v5_with_export.ipynb`.
+   - This will train the Bi-LSTM model on the dataset and automatically execute the artifact exporter.
+   - It outputs three JSON files (`model_metadata.json`, `forecasts.json`, `training_history.json`) directly into the `project/website/` folder.
+
+2. **Start the Dashboard Server:**
+   - Navigate to the `project/website/` folder.
+   - Double-click the `start_website.bat` file.
+   - *Alternatively*, open a terminal, `cd` into `project/website/`, and run: `python -m http.server 8787`
+
+3. **View the Application:**
+   - Open your web browser and go to: [http://localhost:8787](http://localhost:8787)
+   - The interactive demand forecasting dashboard will load using the freshly generated model data.
+
+---
+
+## 7. Inverse Scaling — How Predictions Are Denormalized
 
 The model outputs a value in **[0, 1]** (normalised space). To get actual unit demand:
 
@@ -336,7 +354,7 @@ So a model output of 0.22 translates to:
 
 ---
 
-## 7. Evaluation Metrics
+## 8. Evaluation Metrics
 
 ```python
 # Computed on test set (chronologically last 15% of data)
@@ -366,7 +384,7 @@ $$R² = 1 - \frac{\sum (y_{true} - y_{pred})^2}{\sum (y_{true} - \bar{y})^2}$$
 
 ---
 
-## 8. Per-Entity Performance
+## 9. Per-Entity Performance
 
 | Entity | MAE (units) | Difficulty Explanation |
 |---|---|---|
@@ -390,7 +408,7 @@ $$R² = 1 - \frac{\sum (y_{true} - y_{pred})^2}{\sum (y_{true} - \bar{y})^2}$$
 
 ---
 
-## 9. Business Impact: Inventory Cost Reduction
+## 10. Business Impact: Inventory Cost Reduction
 
 With the model's accuracy (MAE = ±9.62 units):
 
@@ -409,7 +427,7 @@ The ±9.62 MAE means the model can signal when to pre-order before stockouts, re
 
 ---
 
-## 10. Training Observations (From Actual Logs)
+## 11. Training Observations (From Actual Logs)
 
 ```
 Epoch  1: loss=0.0127, val_loss=0.0044 (LR=0.001)
@@ -429,7 +447,7 @@ Epoch 50: loss=0.0010, val_loss=0.0009  (LR=0.000031)
 
 ---
 
-## 11. Reproducibility Seeds
+## 12. Reproducibility Seeds
 
 ```python
 os.environ['PYTHONHASHSEED'] = '42'
@@ -442,7 +460,7 @@ All random processes (weight initialisation, Dropout, data shuffling) are seeded
 
 ---
 
-## 12. Website: How It Works
+## 13. Website: How It Works
 
 The website (`project/website/`) is a **static HTML+JS dashboard** that reads pre-computed JSON files output by the model.
 
@@ -473,7 +491,7 @@ TensorFlow/Keras `.keras` models require Python + TensorFlow runtime. Browsers c
 
 ---
 
-## 13. Key Technical Decisions — Summary
+## 14. Key Technical Decisions — Summary
 
 | Decision | What | Why |
 |---|---|---|
